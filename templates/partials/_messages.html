@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="toasts" role="status" aria-live="polite">
+  {% for message in messages %}
+  <div class="toast toast-{{ message.tags }}">
+    <p>{{ message }}</p>
+    <button type="button" aria-label="Fermer le message">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,7 @@
+<div class="tally {{ extra }}" role="img" aria-label="{{ f.pourcentage_oui|floatformat:1 }} % de oui, seuil à {{ f.seuil }} %">
+  {% if f.nb_votes_total %}
+  <div class="tally-oui" style="width: {{ f.pourcentage_oui|stringformat:'.1f' }}%"></div>
+  <div class="tally-non" style="width: {{ f.pourcentage_non|stringformat:'.1f' }}%"></div>
+  {% endif %}
+  <span class="tally-mark" style="left: {{ f.seuil|stringformat:'d' }}%" title="Seuil d'ouverture : {{ f.seuil }} %"></span>
+</div>

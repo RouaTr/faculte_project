@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ filiere.nom }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'filiere_list' %}">&larr; Toutes les filières</a>
+<div class="page-head">
+  <div>
+    <h1>{{ filiere.nom }}</h1>
+    <p style="margin-top:10px">{% with f=filiere %}{% include "partials/_statut.html" %}{% endwith %}</p>
+  </div>
+  {% if user.role == 'admin' %}
+  <div class="btn-row">
+    <a class="btn btn-quiet" href="{% url 'filiere_update' filiere.pk %}">Modifier</a>
+    <a class="btn btn-quiet" href="{% url 'filiere_delete' filiere.pk %}">Supprimer</a>
+  </div>
+  {% endif %}
+</div>
+
+<div class="detail-grid">
+  <div class="stack">
+    {% if filiere.description %}
+    <section class="card"><h2>À propos de la filière</h2><p style="white-space: pre-line">{{ filiere.description }}</p></section>
+    {% endif %}
+
+    <section class="card">
+      <h2>Résultats</h2>
+      {% if user.role == 'etudiant' and filiere.vote_ouvert %}
+        <p class="muted">Les résultats seront publiés une fois la décision prise, pour que personne ne soit influencé pendant le vote.</p>
+      {% else %}
+        {% with f=filiere %}{% include "partials/_resultats.html" %}{% endwith %}
+      {% endif %}
+    </section>
+
+    {% if user.role != 'etudiant' %}
+    <section class="card">
+      <h2>Réponses des enseignants</h2>
+      {% if reponses_enseignants %}
+      <ul class="reponses">
+        {% for r in reponses_enseignants %}
+        <li>
+          <span class="avatar avatar-sm" aria-hidden="true">{{ r.enseignant.utilisateur.initiales }}</span>
+          <div class="who">
+            <strong>{{ r.enseignant.utilisateur.nom_complet }}</strong>
+            <span>{{ r.enseignant.specialite }}{% if r.commentaire %} – « {{ r.commentaire }} »{% endif %}</span>
+          </div>
+          {% if r.peut_enseigner %}<span class="badge badge-oui">Peut enseigner</span>{% else %}<span class="badge badge-non">Ne peut pas</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="muted">Aucun enseignant n'a encore répondu.</p>{% endif %}
+    </section>
+    {% endif %}
+  </div>
+
+  <aside class="stack">
+    {% if user.role == 'etudiant' %}
+    <section class="card">
+      <h2>Votre vote</h2>
+      {% if filiere.vote_ouvert %}
+        <p class="muted" style="margin-bottom:14px">Voulez-vous que la faculté ouvre une classe de {{ filiere.nom }} ?</p>
+        {% with f=filiere big="choice-pair-big" %}{% include "partials/_participation.html" %}{% endwith %}
+        <p class="panel-note">{% if filiere.mon_choix is None %}Vous n'avez pas encore voté.{% else %}Vous pouvez changer d'avis tant que le vote est ouvert.{% endif %}</p>
+      {% else %}
+        <p>{% if filiere.mon_choix is None %}Vous n'avez pas voté pour cette filière.{% elif filiere.mon_choix %}Vous avez voté <strong>oui</strong>.{% else %}Vous avez voté <strong>non</strong>.{% endif %}</p>
+        <p class="panel-note">Le vote est clos.</p>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% if user.role == 'enseignant' %}
+    <section class="card">
+      <h2>Votre disponibilité</h2>
+      {% if filiere.vote_ouvert %}
+        <form method="post" action="{% url 'filiere_disponibilite' filiere.pk %}">
+          {% csrf_token %}
+          <p class="muted" style="margin-bottom:14px">Pouvez-vous enseigner en {{ filiere.nom }} ?</p>
+          <div class="choice-pair choice-pair-big">
+            <button class="choice choice-oui {% if filiere.mon_choix is True %}is-selected{% endif %}" name="reponse" value="oui" aria-pressed="{% if filiere.mon_choix is True %}true{% else %}false{% endif %}">Je peux enseigner</button>
+            <button class="choice choice-non {% if filiere.mon_choix is False %}is-selected{% endif %}" name="reponse" value="non" aria-pressed="{% if filiere.mon_choix is False %}true{% else %}false{% endif %}">Je ne peux pas</button>
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label for="commentaire">Commentaire (facultatif)</label>
+            <input id="commentaire" type="text" name="commentaire" maxlength="200" value="{{ ma_dispo.commentaire|default:'' }}" placeholder="Modules que vous pourriez assurer…">
+            <p class="hint">Le commentaire est enregistré avec votre réponse.</p>
+          </div>
+        </form>
+      {% else %}
+        <p>{% if filiere.mon_choix is None %}Vous n'avez pas répondu pour cette filière.{% elif filiere.mon_choix %}Vous avez indiqué <strong>pouvoir enseigner</strong>.{% else %}Vous avez indiqué <strong>ne pas pouvoir enseigner</strong>.{% endif %}</p>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% if peut_decider %}
+    <section class="card">
+      <h2>Décision</h2>
+      {% if filiere.vote_ouvert %}
+        <p class="muted" style="margin-bottom:14px">
+          {% if filiere.recommandation %}Les résultats recommandent d'ouvrir la classe.{% else %}Les conditions d'ouverture ne sont pas toutes réunies.{% endif %}
+          Clore le vote ferme les réponses des étudiants et des enseignants.
+        </p>
+        <form method="post" action="{% url 'filiere_decider' filiere.pk %}" class="btn-row">
+          {% csrf_token %}
+          <button class="btn btn-oui" name="decision" value="ouvrir" data-confirm="Ouvrir la classe de {{ filiere.nom }} et clore le vote ?">Ouvrir la classe</button>
+          <button class="btn btn-quiet" name="decision" value="refuser" data-confirm="Ne pas retenir {{ filiere.nom }} et clore le vote ?">Ne pas la retenir</button>
+        </form>
+      {% else %}
+        <p>
+          {% if filiere.statut == 'ouverte' %}La classe est ouverte.{% else %}La filière n'a pas été retenue.{% endif %}
+          {% if filiere.date_decision %}<span class="muted">Décision du {{ filiere.date_decision|date:"j F Y" }}.</span>{% endif %}
+        </p>
+        {% if user.role == 'admin' %}
+        <form method="post" action="{% url 'filiere_rouvrir' filiere.pk %}" style="margin-top:14px">
+          {% csrf_token %}
+          <button class="btn btn-quiet" data-confirm="Rouvrir le vote ? La décision actuelle sera annulée.">Rouvrir le vote</button>
+        </form>
+        {% endif %}
+      {% endif %}
+    </section>
+    {% elif user.role == 'enseignant' and not filiere.vote_ouvert %}
+    <section class="card"><h2>Décision</h2>
+      <p>{% if filiere.statut == 'ouverte' %}La classe est ouverte.{% else %}La filière n'a pas été retenue.{% endif %}</p>
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

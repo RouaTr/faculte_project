@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block layout %}
+<div class="auth">
+  <div class="auth-aside">
+    <a class="brand" href="{% url 'login' %}">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 6"/></svg></span>
+      <span class="brand-name">Choix des filières<small>Vote de la faculté</small></span>
+    </a>
+    <div>
+      <h1>Quelle filière ouvre la prochaine rentrée ?</h1>
+      <p>Les étudiants votent, les enseignants indiquent leurs disponibilités, et la faculté décide à partir des résultats.</p>
+    </div>
+  </div>
+  <main id="contenu" class="auth-main">
+    <div class="auth-box">
+      <h2>Connexion</h2>
+      <p class="muted">Utilisez l'identifiant fourni par l'administration.</p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert-form" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+        {% include "partials/_field.html" with field=form.username %}
+        {% include "partials/_field.html" with field=form.password %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="btn" type="submit">Se connecter</button>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

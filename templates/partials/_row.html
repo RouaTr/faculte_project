@@ -1,0 +1,18 @@
+<article class="row-item">
+  <div>
+    <h3><a href="{% url 'filiere_detail' f.pk %}">{{ f.nom }}</a> {% include "partials/_statut.html" %}</h3>
+    {% if f.description %}<p class="clamp">{{ f.description|truncatechars:130 }}</p>{% endif %}
+  </div>
+  <div class="row-results">
+    {% if user.role != 'etudiant' or not f.vote_ouvert %}
+      {% include "partials/_tally.html" %}
+      {% if f.nb_votes_total %}
+        <strong>{{ f.pourcentage_oui|floatformat:1 }} %</strong> de oui sur {{ f.nb_votes_total }} vote{{ f.nb_votes_total|pluralize }},
+      {% else %}Aucun vote pour l'instant,{% endif %}
+      {{ f.nb_enseignants_disponibles }} enseignant{{ f.nb_enseignants_disponibles|pluralize }} disponible{{ f.nb_enseignants_disponibles|pluralize }}
+    {% else %}
+      <span class="muted">Les résultats seront publiés après la décision.</span>
+    {% endif %}
+  </div>
+  <div class="row-actions">{% include "partials/_participation.html" %}</div>
+</article>

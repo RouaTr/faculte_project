@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Accès refusé{% endblock %}
+{% block content %}
+<div class="center-page"><div>
+  <p class="code">403</p>
+  <h1 style="margin:10px 0">Cette page n'est pas pour vous</h1>
+  <p class="muted" style="margin-bottom:20px">Votre rôle ne donne pas accès à cette action.</p>
+  <a class="btn" href="{% url 'dashboard' %}">Retour au tableau de bord</a>
+</div></div>
+{% endblock %}

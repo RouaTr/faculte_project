@@ -1,0 +1,29 @@
+{% load static %}
+<div class="verdict-line">
+  <span class="verdict">{{ f.pourcentage_oui|floatformat:1 }} %</span>
+  <span class="muted">
+    {% if f.nb_votes_total %}des {{ f.nb_votes_total }} étudiant{{ f.nb_votes_total|pluralize }} qui ont voté veulent cette filière{% else %}Aucun étudiant n'a encore voté{% endif %}
+  </span>
+</div>
+{% include "partials/_tally.html" with extra="tally-big" %}
+<div class="tally-legend"><span>{{ f.nb_votes_oui }} oui</span><span>Seuil d'ouverture : {{ f.seuil }} %</span><span>{{ f.nb_votes_non }} non</span></div>
+<dl class="facts">
+  <div><dt>Participation</dt><dd>{{ f.taux_participation|floatformat:0 }} %<br><small>des étudiants inscrits</small></dd></div>
+  <div><dt>Enseignants disponibles</dt><dd>{{ f.nb_enseignants_disponibles }} <small>sur {{ f.min_enseignants }} requis</small></dd></div>
+</dl>
+{% if f.recommandation %}
+<div class="reco reco-ok">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+  <p>Les résultats justifient l'ouverture d'une classe de {{ f.nom }}.</p>
+</div>
+{% else %}
+<div class="reco reco-no">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+  <div>Les conditions d'ouverture ne sont pas encore réunies :
+    <ul>
+      {% if not f.seuil_atteint %}<li>il faut au moins {{ f.seuil }} % de oui parmi les votants ;</li>{% endif %}
+      {% if not f.enseignants_suffisants %}<li>il faut au moins {{ f.min_enseignants }} enseignant{{ f.min_enseignants|pluralize }} disponible{{ f.min_enseignants|pluralize }}.</li>{% endif %}
+    </ul>
+  </div>
+</div>
+{% endif %}

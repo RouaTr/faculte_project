@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ titre }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'utilisateur_list' %}">&larr; Tous les utilisateurs</a>
+<div class="page-head"><h1>{{ titre }}</h1></div>
+<form method="post" class="card form-card" novalidate>
+  {% csrf_token %}
+  {% if form.errors %}<div class="alert-form" role="alert">Le formulaire contient des erreurs. Corrigez les champs signalés ci-dessous.</div>{% endif %}
+
+  <fieldset>
+    <legend>Identité</legend>
+    <div class="form-grid">
+      {% include "partials/_field.html" with field=form.first_name %}
+      {% include "partials/_field.html" with field=form.last_name %}
+      {% include "partials/_field.html" with field=form.email wide=True %}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Compte</legend>
+    <div class="form-grid">
+      {% include "partials/_field.html" with field=form.username %}
+      <div class="field {% if form.role.errors %}has-error{% endif %}">
+        <label for="{{ form.role.id_for_label }}">Rôle <span aria-hidden="true">*</span></label>
+        {{ form.role }}
+        {% if form.role.help_text %}<p class="hint">{{ form.role.help_text }}</p>{% endif %}
+        {% for e in form.role.errors %}<p class="error">{{ e }}</p>{% endfor %}
+      </div>
+      {% include "partials/_field.html" with field=form.password1 %}
+      {% include "partials/_field.html" with field=form.password2 %}
+      {% if form.is_active %}{% include "partials/_field.html" with field=form.is_active wide=True %}{% endif %}
+    </div>
+  </fieldset>
+
+  <fieldset data-profile="etudiant">
+    <legend>Profil étudiant</legend>
+    <div class="form-grid">
+      {% include "partials/_field.html" with field=form.matricule %}
+      {% include "partials/_field.html" with field=form.niveau %}
+    </div>
+  </fieldset>
+
+  <fieldset data-profile="enseignant">
+    <legend>Profil enseignant</legend>
+    <div class="form-grid">
+      {% include "partials/_field.html" with field=form.specialite %}
+      {% include "partials/_field.html" with field=form.grade %}
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <button class="btn" type="submit">{% if object %}Enregistrer les modifications{% else %}Créer le compte{% endif %}</button>
+    <a class="btn btn-quiet" href="{% url 'utilisateur_list' %}">Annuler</a>
+  </div>
+</form>
+<script>document.getElementById("{{ form.role.id_for_label }}").setAttribute("data-role-select", "");</script>
+{% endblock %}

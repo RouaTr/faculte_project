@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ object.nom_complet }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'utilisateur_list' %}">&larr; Tous les utilisateurs</a>
+<div class="page-head"><h1>Supprimer ce compte ?</h1></div>
+<form method="post" class="card form-card">
+  {% csrf_token %}
+  <p>Vous allez supprimer le compte de <strong>{{ object.nom_complet }}</strong> ({{ object.get_role_display|lower }}).
+    {% if object.role == 'etudiant' or object.role == 'enseignant' %}Ses votes ou ses réponses seront aussi supprimés et les résultats des filières seront recalculés.{% endif %}
+    Cette action est définitive.</p>
+  <p class="panel-note">Pour garder l'historique, désactivez plutôt le compte depuis « Modifier ».</p>
+  <div class="form-actions" style="margin-top:24px">
+    <button class="btn btn-danger" type="submit">Supprimer le compte</button>
+    <a class="btn btn-quiet" href="{% url 'utilisateur_list' %}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

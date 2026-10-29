@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ titre }}{% endblock %}
+{% block content %}
+<a class="back" href="{% if object %}{% url 'filiere_detail' object.pk %}{% else %}{% url 'filiere_list' %}{% endif %}">&larr; Retour</a>
+<div class="page-head"><h1>{{ titre }}</h1></div>
+<form method="post" class="card form-card" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert-form">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  <div class="stack" style="--gap:16px">
+    {% include "partials/_field.html" with field=form.nom %}
+    {% include "partials/_field.html" with field=form.description %}
+  </div>
+  <div class="form-actions" style="margin-top:24px">
+    <button class="btn" type="submit">{% if object %}Enregistrer les modifications{% else %}Ouvrir au vote{% endif %}</button>
+    <a class="btn btn-quiet" href="{% if object %}{% url 'filiere_detail' object.pk %}{% else %}{% url 'filiere_list' %}{% endif %}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

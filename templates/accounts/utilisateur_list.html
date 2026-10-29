@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Utilisateurs{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Utilisateurs</h1><p class="muted">{{ total }} compte{{ total|pluralize }} sur la plateforme.</p></div>
+  <a class="btn" href="{% url 'utilisateur_create' %}">Ajouter un utilisateur</a>
+</div>
+
+<div class="toolbar">
+  <form method="get" role="search">
+    {% if role_actif %}<input type="hidden" name="role" value="{{ role_actif }}">{% endif %}
+    <label class="sr-only" for="q">Rechercher un utilisateur</label>
+    <input id="q" type="search" name="q" value="{{ q }}" placeholder="Nom, e-mail, identifiant ou matricule">
+    <button class="btn btn-quiet" type="submit">Rechercher</button>
+  </form>
+  <div class="pills" aria-label="Filtrer par rôle">
+    <a class="pill" href="?{% if q %}q={{ q|urlencode }}{% endif %}" {% if not role_actif %}aria-current="true"{% endif %}>Tous</a>
+    {% for value, label in roles %}
+    <a class="pill" href="?role={{ value }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}" {% if role_actif == value %}aria-current="true"{% endif %}>{{ label }}s</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if object_list %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th scope="col">Utilisateur</th><th scope="col">Rôle</th><th scope="col">Profil</th><th scope="col">État</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>
+      {% for u in object_list %}
+      <tr>
+        <td><div class="cell-user"><span class="avatar avatar-sm" aria-hidden="true">{{ u.initiales }}</span>
+          <div><strong><a href="{% url 'utilisateur_detail' u.pk %}">{{ u.nom_complet }}</a></strong><span>{{ u.email|default:u.username }}</span></div></div></td>
+        <td><span class="badge badge-role">{{ u.get_role_display }}</span></td>
+        <td class="small">
+          {% if u.role == 'etudiant' and u.etudiant %}{{ u.etudiant.matricule }}, {{ u.etudiant.get_niveau_display }}
+          {% elif u.role == 'enseignant' and u.enseignant %}{{ u.enseignant.specialite }}, {{ u.enseignant.get_grade_display }}
+          {% else %}<span class="muted">–</span>{% endif %}
+        </td>
+        <td>{% if u.is_active %}<span class="badge badge-oui">Actif</span>{% else %}<span class="badge badge-plain">Désactivé</span>{% endif %}</td>
+        <td class="actions">
+          <a class="btn btn-quiet btn-sm" href="{% url 'utilisateur_update' u.pk %}">Modifier</a>
+          {% if u.pk != user.pk %}<a class="btn btn-quiet btn-sm" href="{% url 'utilisateur_delete' u.pk %}">Supprimer</a>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% else %}
+<div class="rows"><div class="empty">
+  <h3>Aucun utilisateur trouvé</h3>
+  <p>Modifiez votre recherche ou retirez le filtre de rôle.</p>
+</div></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ object.nom }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'filiere_detail' object.pk %}">&larr; Retour</a>
+<div class="page-head"><h1>Supprimer la filière ?</h1></div>
+<form method="post" class="card form-card">
+  {% csrf_token %}
+  <p>Vous allez supprimer <strong>{{ object.nom }}</strong> avec ses <strong>{{ object.nb_votes_total }}</strong> vote{{ object.nb_votes_total|pluralize }} et les réponses des enseignants. Cette action est définitive.</p>
+  <div class="form-actions" style="margin-top:24px">
+    <button class="btn btn-danger" type="submit">Supprimer la filière</button>
+    <a class="btn btn-quiet" href="{% url 'filiere_detail' object.pk %}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

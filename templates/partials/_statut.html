@@ -1,0 +1,3 @@
+{% if f.statut == 'en_vote' %}<span class="badge badge-wait">En cours de vote</span>
+{% elif f.statut == 'ouverte' %}<span class="badge badge-oui">Classe ouverte</span>
+{% else %}<span class="badge badge-non">Non retenue</span>{% endif %}

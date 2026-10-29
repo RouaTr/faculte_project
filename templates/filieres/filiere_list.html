@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Filières{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Filières</h1><p class="muted">Les filières proposées et l'état de chaque vote.</p></div>
+  {% if user.role == 'admin' %}<a class="btn" href="{% url 'filiere_create' %}">Proposer une filière</a>{% endif %}
+</div>
+
+<div class="toolbar">
+  <form method="get" role="search">
+    {% if statut_actif %}<input type="hidden" name="statut" value="{{ statut_actif }}">{% endif %}
+    <label class="sr-only" for="q">Rechercher une filière</label>
+    <input id="q" type="search" name="q" value="{{ q }}" placeholder="Rechercher une filière">
+    <button class="btn btn-quiet" type="submit">Rechercher</button>
+  </form>
+  <div class="pills" aria-label="Filtrer par statut">
+    <a class="pill" href="?{% if q %}q={{ q|urlencode }}{% endif %}" {% if not statut_actif %}aria-current="true"{% endif %}>Toutes</a>
+    {% for value, label in statuts %}
+    <a class="pill" href="?statut={{ value }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}" {% if statut_actif == value %}aria-current="true"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if filieres %}
+<div class="rows">{% for f in filieres %}{% include "partials/_row.html" %}{% endfor %}</div>
+{% include "partials/_pagination.html" %}
+{% else %}
+<div class="rows"><div class="empty">
+  <h3>{% if q or statut_actif %}Aucune filière ne correspond{% else %}Aucune filière pour l'instant{% endif %}</h3>
+  <p>{% if q or statut_actif %}Essayez un autre mot-clé ou retirez le filtre.{% elif user.role == 'admin' %}Proposez la première filière pour lancer un vote.{% else %}L'administration n'a pas encore proposé de filière.{% endif %}</p>
+  {% if user.role == 'admin' and not q and not statut_actif %}<a class="btn" href="{% url 'filiere_create' %}">Proposer une filière</a>{% endif %}
+</div></div>
+{% endif %}
+{% endblock %}

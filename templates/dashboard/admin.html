@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Bonjour {{ user.first_name|default:user.username }}</h1>
+    <p class="muted">Voici où en sont les votes pour les nouvelles filières.</p>
+  </div>
+  <div class="btn-row">
+    <a class="btn" href="{% url 'filiere_create' %}">Proposer une filière</a>
+    <a class="btn btn-quiet" href="{% url 'utilisateur_create' %}">Ajouter un utilisateur</a>
+  </div>
+</div>
+
+<div class="stack">
+  <div class="figures">
+    <div class="figure"><strong>{{ nb_etudiants }}</strong><span>étudiant{{ nb_etudiants|pluralize }}</span></div>
+    <div class="figure"><strong>{{ nb_enseignants }}</strong><span>enseignant{{ nb_enseignants|pluralize }}</span></div>
+    <div class="figure"><strong>{{ nb_en_vote }}</strong><span>filière{{ nb_en_vote|pluralize }} en cours de vote</span></div>
+    <div class="figure"><strong>{{ nb_ouvertes }}</strong><span>classe{{ nb_ouvertes|pluralize }} ouverte{{ nb_ouvertes|pluralize }}</span></div>
+  </div>
+
+  <section>
+    <div class="section-head"><h2>Votes en cours</h2><a href="{% url 'filiere_list' %}">Toutes les filières</a></div>
+    {% if en_vote %}
+    <div class="rows">{% for f in en_vote %}{% include "partials/_row.html" %}{% endfor %}</div>
+    {% else %}
+    <div class="rows"><div class="empty">
+      <h3>Aucun vote en cours</h3>
+      <p>Proposez une filière pour que les étudiants et les enseignants puissent répondre.</p>
+      <a class="btn" href="{% url 'filiere_create' %}">Proposer une filière</a>
+    </div></div>
+    {% endif %}
+  </section>
+
+  {% if recentes %}
+  <section>
+    <div class="section-head"><h2>Dernières décisions</h2></div>
+    <div class="rows">{% for f in recentes %}{% include "partials/_row.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

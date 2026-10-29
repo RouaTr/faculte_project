@@ -1,0 +1,19 @@
+{% if f.vote_ouvert %}
+  {% if user.role == 'etudiant' %}
+  <form method="post" action="{% url 'filiere_voter' f.pk %}" class="choice-pair {{ big }}">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button class="choice choice-oui {% if f.mon_choix is True %}is-selected{% endif %}" name="choix" value="oui" aria-pressed="{% if f.mon_choix is True %}true{% else %}false{% endif %}">Oui, je la veux</button>
+    <button class="choice choice-non {% if f.mon_choix is False %}is-selected{% endif %}" name="choix" value="non" aria-pressed="{% if f.mon_choix is False %}true{% else %}false{% endif %}">Non</button>
+  </form>
+  {% elif user.role == 'enseignant' %}
+  <form method="post" action="{% url 'filiere_disponibilite' f.pk %}" class="choice-pair {{ big }}">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button class="choice choice-oui {% if f.mon_choix is True %}is-selected{% endif %}" name="reponse" value="oui" aria-pressed="{% if f.mon_choix is True %}true{% else %}false{% endif %}">Je peux enseigner</button>
+    <button class="choice choice-non {% if f.mon_choix is False %}is-selected{% endif %}" name="reponse" value="non" aria-pressed="{% if f.mon_choix is False %}true{% else %}false{% endif %}">Je ne peux pas</button>
+  </form>
+  {% endif %}
+{% elif user.role == 'etudiant' and f.mon_choix is not None %}
+  <span class="small muted">Votre vote : <strong>{% if f.mon_choix %}oui{% else %}non{% endif %}</strong></span>
+{% elif user.role == 'enseignant' and f.mon_choix is not None %}
+  <span class="small muted">Votre réponse : <strong>{% if f.mon_choix %}peut enseigner{% else %}ne peut pas{% endif %}</strong></span>
+{% endif %}

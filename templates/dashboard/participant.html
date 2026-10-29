@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Bonjour {{ user.first_name|default:user.username }}</h1>
+    <p class="muted">
+      {% if user.role == 'etudiant' %}Dites-nous quelles nouvelles filières vous voulez voir ouvrir. Votre vote reste modifiable tant que le vote est ouvert.
+      {% else %}Indiquez les filières que vous pouvez enseigner. Vous suivez ici les résultats au fil des réponses.{% endif %}
+    </p>
+  </div>
+</div>
+
+<div class="stack">
+  <section>
+    <div class="section-head"><h2>{% if user.role == 'etudiant' %}À voter{% else %}À renseigner{% endif %}</h2></div>
+    {% if a_traiter %}
+    <div class="rows">{% for f in a_traiter %}{% include "partials/_row.html" %}{% endfor %}</div>
+    {% else %}
+    <div class="rows"><div class="empty">
+      <h3>Vous êtes à jour</h3>
+      <p>{% if deja_repondu %}Vous avez répondu à toutes les filières ouvertes au vote.{% else %}Aucune filière n'est ouverte au vote pour le moment.{% endif %}</p>
+    </div></div>
+    {% endif %}
+  </section>
+
+  {% if deja_repondu %}
+  <section>
+    <div class="section-head"><h2>Vos réponses</h2></div>
+    <div class="rows">{% for f in deja_repondu %}{% include "partials/_row.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  {% if decisions %}
+  <section>
+    <div class="section-head"><h2>Décisions récentes</h2></div>
+    <div class="rows">{% for f in decisions %}{% include "partials/_row.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

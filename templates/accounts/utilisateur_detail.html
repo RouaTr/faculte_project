@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ utilisateur.nom_complet }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'utilisateur_list' %}">&larr; Tous les utilisateurs</a>
+<div class="page-head">
+  <div><h1>{{ utilisateur.nom_complet }}</h1><p style="margin-top:10px"><span class="badge badge-role">{{ utilisateur.get_role_display }}</span></p></div>
+  <div class="btn-row">
+    <a class="btn btn-quiet" href="{% url 'utilisateur_update' utilisateur.pk %}">Modifier</a>
+    {% if utilisateur.pk != user.pk %}<a class="btn btn-quiet" href="{% url 'utilisateur_delete' utilisateur.pk %}">Supprimer</a>{% endif %}
+  </div>
+</div>
+<section class="card form-card">
+  <dl class="dl">
+    <dt>Prénom</dt><dd>{{ utilisateur.first_name }}</dd>
+    <dt>Nom</dt><dd>{{ utilisateur.last_name }}</dd>
+    <dt>Adresse e-mail</dt><dd>{{ utilisateur.email }}</dd>
+    <dt>Identifiant</dt><dd>{{ utilisateur.username }}</dd>
+    {% if utilisateur.etudiant %}
+    <dt>Matricule</dt><dd>{{ utilisateur.etudiant.matricule }}</dd>
+    <dt>Niveau</dt><dd>{{ utilisateur.etudiant.get_niveau_display }}</dd>
+    {% elif utilisateur.enseignant %}
+    <dt>Spécialité</dt><dd>{{ utilisateur.enseignant.specialite }}</dd>
+    <dt>Grade</dt><dd>{{ utilisateur.enseignant.get_grade_display }}</dd>
+    {% endif %}
+    <dt>État du compte</dt><dd>{% if utilisateur.is_active %}Actif{% else %}Désactivé{% endif %}</dd>
+    <dt>Inscrit le</dt><dd>{{ utilisateur.date_joined|date:"j F Y" }}</dd>
+    <dt>Dernière connexion</dt><dd>{% if utilisateur.last_login %}{{ utilisateur.last_login|date:"j F Y à H:i" }}{% else %}Jamais connecté{% endif %}</dd>
+  </dl>
+</section>
+{% endblock %}
